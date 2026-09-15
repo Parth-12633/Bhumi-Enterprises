@@ -6,7 +6,7 @@ let dbConnected = false;
 
 // We need a small wrapper to ensure the DB connects when the serverless function wakes up
 export const handler = serverless(app, {
-  request: async (request, event, context) => {
+  request: async (request: any, event: any, context: any) => {
     if (!dbConnected) {
       await connectDB();
       dbConnected = true;

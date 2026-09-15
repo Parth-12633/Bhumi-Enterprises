@@ -46,7 +46,7 @@ export const updateRate = async (req: AuthRequest, res: Response) => {
     if (!rate) return res.status(404).json({ success: false, message: 'Rate not found' });
 
     if (status) rate.status = status;
-    rate.updatedBy = req.user?._id;
+    if (req.user) rate.updatedBy = req.user._id;
     await rate.save();
 
     res.json({ success: true, data: rate });
