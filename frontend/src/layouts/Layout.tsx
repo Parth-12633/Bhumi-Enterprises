@@ -15,7 +15,6 @@ const Layout = () => {
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { name: 'Employees', icon: Users, path: '/employees' },
-    { name: 'Rate Master', icon: Calculator, path: '/rate-master' },
     { name: 'Sites', icon: MapPin, path: '/sites' },
     { name: 'Reports', icon: FileText, path: '/reports' },
   ];

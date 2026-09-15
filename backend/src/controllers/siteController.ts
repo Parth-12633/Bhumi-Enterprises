@@ -62,3 +62,15 @@ export const updateSite = async (req: AuthRequest, res: Response) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+export const deleteSite = async (req: AuthRequest, res: Response) => {
+  try {
+    const site = await Site.findById(req.params.id);
+    if (!site) return res.status(404).json({ success: false, message: 'Site not found' });
+    
+    await Site.deleteOne({ _id: site._id });
+    res.json({ success: true, message: 'Site deleted' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

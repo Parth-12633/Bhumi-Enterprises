@@ -165,10 +165,32 @@ const Sites = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-3 text-gray-400">
-                        <button className="hover:text-red-500 transition-colors" onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className="hover:text-red-500 transition-colors" 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Are you sure you want to delete this site?')) {
+                              try {
+                                await axios.delete(`/api/sites/${site._id}`, {
+                                  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                                });
+                                queryClient.invalidateQueries({ queryKey: ['sites'] });
+                              } catch (error) {
+                                alert('Error deleting site');
+                              }
+                            }
+                          }}
+                        >
                           <Trash2 size={16} />
                         </button>
-                        <button className="hover:text-blue-600 transition-colors" onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className="hover:text-blue-600 transition-colors" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // If they want to edit a site, it should go to site profile, but wait...
+                            navigate(`/sites/${site._id}`);
+                          }}
+                        >
                           <Edit size={16} />
                         </button>
                       </div>

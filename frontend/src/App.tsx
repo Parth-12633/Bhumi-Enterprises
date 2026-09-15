@@ -12,7 +12,6 @@ import AddEmployee from './pages/AddEmployee';
 import EditEmployee from './pages/EditEmployee';
 import Sites from './pages/Sites';
 import SiteProfile from './pages/SiteProfile';
-import RateMaster from './pages/RateMaster';
 import EditPayment from './pages/EditPayment';
 import DailyWork from './pages/DailyWork';
 import Payments from './pages/Payments';
@@ -47,7 +46,6 @@ function AppRoutes() {
         <Route path="daily-work" element={<DailyWork />} />
         <Route path="sites" element={<Sites />} />
         <Route path="sites/:id" element={<SiteProfile />} />
-        <Route path="rate-master" element={<RateMaster />} />
         <Route path="payments" element={<Payments />} />
         <Route path="reports" element={<Reports />} />
         <Route path="edit-work/:id" element={<EditWorkRecord />} />

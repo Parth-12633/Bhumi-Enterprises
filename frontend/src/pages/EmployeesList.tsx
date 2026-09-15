@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Plus, Trash2, Edit2, MoreHorizontal } from 'lucide-react';
@@ -11,6 +11,7 @@ const fetchEmployees = async () => {
 };
 
 const EmployeesList = () => {
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
   const [search, setSearch] = useState(initialSearch);
@@ -115,11 +116,32 @@ const EmployeesList = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-3 text-gray-400">
-                        <button className="hover:text-red-500 transition-colors" onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className="hover:text-red-500 transition-colors" 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Are you sure you want to delete this employee?')) {
+                              try {
+                                await axios.delete(`/api/employees/${employee._id}`, {
+                                  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                                });
+                                queryClient.invalidateQueries({ queryKey: ['employees'] });
+                              } catch (error) {
+                                alert('Error deleting employee');
+                              }
+                            }
+                          }}
+                        >
                           <Trash2 size={16} />
                         </button>
-                        <button className="hover:text-gray-700 transition-colors" onClick={(e) => e.stopPropagation()}>
-                          <MoreHorizontal size={16} />
+                        <button 
+                          className="hover:text-gray-700 transition-colors" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/employees/${employee._id}/edit`);
+                          }}
+                        >
+                          <Edit2 size={16} />
                         </button>
                       </div>
                     </td>

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getEmployees, getEmployeeById, createEmployee, updateEmployee } from '../controllers/employeeController';
+import { getEmployees, getEmployeeById, createEmployee, updateEmployee, deleteEmployee } from '../controllers/employeeController';
 import { protect } from '../middleware/auth';
 
 const router = express.Router();
@@ -10,6 +10,7 @@ router.route('/')
 
 router.route('/:id')
   .get(protect, getEmployeeById)
-  .patch(protect, updateEmployee);
+  .patch(protect, updateEmployee)
+  .delete(protect, deleteEmployee);
 
 export default router;
