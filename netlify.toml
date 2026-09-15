@@ -2,7 +2,7 @@
   base = "frontend"
   publish = "dist"
   # This command builds the frontend, then goes to the backend, installs dependencies, and builds the TypeScript backend!
-  command = "npm install && npx esbuild --version && npm run build && cd ../backend && npm install && npm run build"
+  command = "npm install && npm rebuild esbuild && npm run build && cd ../backend && npm install && npm run build"
 
 [functions]
   # Tell Netlify to look for the compiled backend functions in the backend/dist folder
