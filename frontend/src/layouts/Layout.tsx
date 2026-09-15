@@ -86,7 +86,9 @@ const Layout = () => {
           {/* Right Actions */}
           <div className="flex items-center gap-3 md:gap-6">
             <button 
-              onClick={() => document.documentElement.classList.toggle('dark')}
+              onClick={() => {
+                document.documentElement.classList.toggle('dark-mode-filter');
+              }}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
               <Moon size={20} />
@@ -115,7 +117,7 @@ const Layout = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-8 print:p-0">
+        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 print:p-0">
           <Outlet />
         </main>
       </div>

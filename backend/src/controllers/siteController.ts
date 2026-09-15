@@ -26,13 +26,20 @@ export const getSiteById = async (req: AuthRequest, res: Response) => {
 
 export const createSite = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, location, clientName, notes } = req.body;
+    let { name, location, clientName, notes, startDate, endDate, status } = req.body;
     
+    if (endDate && new Date(endDate) <= new Date()) {
+      status = 'COMPLETED';
+    }
+
     const site = new Site({
       name,
       location,
       clientName,
-      notes
+      notes,
+      startDate,
+      endDate,
+      status: status || 'ACTIVE'
     });
 
     const createdSite = await site.save();
@@ -50,8 +57,16 @@ export const updateSite = async (req: AuthRequest, res: Response) => {
       site.name = req.body.name || site.name;
       site.location = req.body.location || site.location;
       site.clientName = req.body.clientName || site.clientName;
-      site.status = req.body.status || site.status;
       site.notes = req.body.notes || site.notes;
+      
+      if (req.body.startDate !== undefined) site.startDate = req.body.startDate;
+      if (req.body.endDate !== undefined) site.endDate = req.body.endDate;
+      
+      site.status = req.body.status || site.status;
+
+      if (site.endDate && new Date(site.endDate) <= new Date()) {
+        site.status = 'COMPLETED';
+      }
 
       const updatedSite = await site.save();
       res.json({ success: true, data: updatedSite });

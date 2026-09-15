@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Save, ArrowLeft, User, Briefcase, X } from 'lucide-react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Save, ArrowLeft, User, Briefcase, Trash2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const EditEmployee = () => {
   const { id } = useParams();
@@ -21,7 +21,8 @@ const EditEmployee = () => {
     name: '',
     mobile: '',
     dailyRate: '',
-    joinDate: ''
+    joinDate: '',
+    photo: ''
   });
 
   useEffect(() => {
@@ -30,68 +31,11 @@ const EditEmployee = () => {
         name: employee.name || '',
         mobile: employee.mobile || '',
         dailyRate: employee.dailyRate ? (employee.dailyRate / 100).toString() : '',
-        joinDate: employee.joinDate ? employee.joinDate.split('T')[0] : ''
+        joinDate: employee.joinDate ? employee.joinDate.split('T')[0] : '',
+        photo: employee.photo || ''
       });
     }
   }, [employee]);
-
-  const [frontPhotoPreview, setFrontPhotoPreview] = useState<string | null>(null);
-  const [backPhotoPreview, setBackPhotoPreview] = useState<string | null>(null);
-
-  // WebRTC Camera State
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [cameraType, setCameraType] = useState<'FRONT' | 'BACK'>('FRONT');
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const startCamera = async (type: 'FRONT' | 'BACK') => {
-    setCameraType(type);
-    setIsCameraOpen(true);
-    
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: type === 'FRONT' ? 'user' : 'environment' }
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      alert("Camera access denied or no camera found.");
-      setIsCameraOpen(false);
-    }
-  };
-
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
-    }
-    setIsCameraOpen(false);
-  };
-
-  const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
-      if (context) {
-        canvasRef.current.width = videoRef.current.videoWidth;
-        canvasRef.current.height = videoRef.current.videoHeight;
-        context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-        const dataUrl = canvasRef.current.toDataURL('image/jpeg');
-        if (cameraType === 'FRONT') setFrontPhotoPreview(dataUrl);
-        else setBackPhotoPreview(dataUrl);
-        stopCamera();
-      }
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
 
   const editEmployeeMutation = useMutation({
     mutationFn: async (updatedEmployee: any) => {
@@ -187,36 +131,42 @@ const EditEmployee = () => {
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
               <User size={16} /> Employee Photo
             </h2>
-            <div className="flex flex-col md:flex-row gap-4">
-              <button 
-                type="button" 
-                onClick={() => startCamera('FRONT')}
-                className="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all text-gray-500 relative overflow-hidden min-h-[150px]"
-              >
-                {frontPhotoPreview ? (
-                  <img src={frontPhotoPreview} alt="Selfie Preview" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <>
-                    <span className="text-2xl mb-2">🤳</span>
-                    <span className="text-sm font-bold text-center text-blue-600">Update Front Photo<br/><span className="text-[10px] text-gray-400 font-normal">(Selfie)</span></span>
-                  </>
-                )}
-              </button>
-              
-              <button 
-                type="button"
-                onClick={() => startCamera('BACK')}
-                className="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all text-gray-500 relative overflow-hidden min-h-[150px]"
-              >
-                {backPhotoPreview ? (
-                  <img src={backPhotoPreview} alt="Document Preview" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <>
-                    <span className="text-2xl mb-2">📸</span>
-                    <span className="text-sm font-bold text-center text-blue-600">Update Back Photo<br/><span className="text-[10px] text-gray-400 font-normal">(Document)</span></span>
-                  </>
-                )}
-              </button>
+            <div className="flex flex-col gap-4">
+              {formData.photo ? (
+                <div className="relative w-32 h-32 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                  <img src={formData.photo} alt="Profile" className="w-full h-full object-cover" />
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({ ...formData, photo: '' })}
+                    className="absolute top-1 right-1 bg-white/90 p-1.5 rounded-full text-red-600 hover:bg-white shadow-sm"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full max-w-sm">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({ ...formData, photo: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2.5 file:px-4
+                      file:rounded-xl file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-blue-50 file:text-blue-700
+                      hover:file:bg-blue-100 cursor-pointer"
+                  />
+                  <p className="text-xs text-gray-400 mt-2">Upload a profile photo (max 1MB). Mobile users can click to open camera.</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -274,43 +224,6 @@ const EditEmployee = () => {
           </button>
         </div>
       </form>
-
-      {/* WebRTC Camera Modal */}
-      {isCameraOpen && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4">
-          <div className="relative w-full max-w-md bg-black rounded-3xl overflow-hidden flex flex-col items-center border border-gray-800">
-            <div className="absolute top-4 right-4 z-10">
-              <button 
-                onClick={stopCamera}
-                className="w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="w-full relative bg-gray-900 flex-1 min-h-[400px] flex items-center justify-center">
-              <video 
-                ref={videoRef} 
-                autoPlay 
-                playsInline 
-                muted 
-                className="w-full h-full object-cover"
-                style={{ transform: cameraType === 'FRONT' ? 'scaleX(-1)' : 'none' }}
-              />
-              <canvas ref={canvasRef} className="hidden" />
-            </div>
-
-            <div className="p-6 w-full flex justify-center bg-black">
-              <button 
-                onClick={capturePhoto}
-                className="w-16 h-16 rounded-full border-4 border-white bg-white/20 flex items-center justify-center relative hover:bg-white/40 transition-colors"
-              >
-                <div className="w-12 h-12 bg-white rounded-full" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -7,6 +7,7 @@ export interface IEmployee extends Document {
   dailyRate: number;
   status: 'ACTIVE' | 'INACTIVE';
   notes?: string;
+  photo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +20,7 @@ const employeeSchema: Schema = new Schema(
     dailyRate: { type: Number, required: true }, // Store as integer paise e.g. 80000 for 800
     status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE' },
     notes: { type: String },
+    photo: { type: String, default: '' },
   },
   {
     timestamps: true,

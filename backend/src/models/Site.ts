@@ -6,6 +6,8 @@ export interface ISite extends Document {
   clientName?: string;
   status: 'ACTIVE' | 'COMPLETED' | 'ON_HOLD';
   notes?: string;
+  startDate?: Date;
+  endDate?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +19,8 @@ const siteSchema: Schema = new Schema(
     clientName: { type: String },
     status: { type: String, enum: ['ACTIVE', 'COMPLETED', 'ON_HOLD'], default: 'ACTIVE' },
     notes: { type: String },
+    startDate: { type: Date },
+    endDate: { type: Date },
   },
   {
     timestamps: true,

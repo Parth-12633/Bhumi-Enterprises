@@ -8,3 +8,12 @@
     font-family: 'Inter', sans-serif;
   }
 }
+
+html.dark-mode-filter {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html.dark-mode-filter img, 
+html.dark-mode-filter video {
+  filter: invert(1) hue-rotate(180deg);
+}

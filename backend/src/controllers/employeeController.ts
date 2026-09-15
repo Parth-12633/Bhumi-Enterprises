@@ -26,14 +26,15 @@ export const getEmployeeById = async (req: AuthRequest, res: Response) => {
 
 export const createEmployee = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, mobile, address, dailyRate, notes } = req.body;
+    const { name, mobile, address, dailyRate, notes, photo } = req.body;
     
     const employee = new Employee({
       name,
       mobile,
       address,
       dailyRate,
-      notes
+      notes,
+      photo
     });
 
     const createdEmployee = await employee.save();
@@ -54,6 +55,7 @@ export const updateEmployee = async (req: AuthRequest, res: Response) => {
       employee.dailyRate = req.body.dailyRate !== undefined ? req.body.dailyRate : employee.dailyRate;
       employee.status = req.body.status || employee.status;
       employee.notes = req.body.notes || employee.notes;
+      if (req.body.photo !== undefined) employee.photo = req.body.photo;
 
       const updatedEmployee = await employee.save();
       res.json({ success: true, data: updatedEmployee });

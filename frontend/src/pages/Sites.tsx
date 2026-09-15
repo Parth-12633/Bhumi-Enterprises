@@ -13,7 +13,7 @@ const Sites = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newSite, setNewSite] = useState({ name: '', location: '' });
+  const [newSite, setNewSite] = useState<any>({ name: '', location: '', startDate: '', endDate: '' });
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('ACTIVE');
 
@@ -76,6 +76,14 @@ const Sites = () => {
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Location</label>
               <input type="text" value={newSite.location} onChange={e => setNewSite({...newSite, location: e.target.value})} className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">Start Date</label>
+              <input type="date" value={newSite.startDate} onChange={e => setNewSite({...newSite, startDate: e.target.value})} className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1.5">End Date (Auto-completes site)</label>
+              <input type="date" value={newSite.endDate} onChange={e => setNewSite({...newSite, endDate: e.target.value})} className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none" />
             </div>
           </div>
           <button type="submit" disabled={addSiteMutation.isPending} className="bg-blue-600 text-white font-bold py-2.5 px-8 rounded-xl self-start mt-2 shadow-sm hover:bg-blue-700 disabled:opacity-70">
@@ -171,9 +179,7 @@ const Sites = () => {
                             e.stopPropagation();
                             if (window.confirm('Are you sure you want to delete this site?')) {
                               try {
-                                await axios.delete(`/api/sites/${site._id}`, {
-                                  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                                });
+                                await axios.delete(`/api/sites/${site._id}`);
                                 queryClient.invalidateQueries({ queryKey: ['sites'] });
                               } catch (error) {
                                 alert('Error deleting site');

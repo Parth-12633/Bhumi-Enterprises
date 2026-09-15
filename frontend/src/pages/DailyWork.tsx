@@ -44,6 +44,10 @@ const DailyWork = () => {
       alert("Please select a site");
       return;
     }
+    if (!workDescription.trim()) {
+      alert("Please enter a Work Description before saving.");
+      return;
+    }
     const promises = Object.entries(selectedHajris).map(([empId, hajri]) => {
       const emp = employees?.find((e: any) => e._id === empId);
       const rate = emp ? emp.dailyRate : 0;

@@ -92,9 +92,13 @@ const EmployeesList = () => {
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg border border-blue-100">
-                          {employee.name.charAt(0).toUpperCase()}
-                        </div>
+                        {employee.photo ? (
+                          <img src={employee.photo} alt={employee.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg border border-blue-100">
+                            {employee.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                         <div>
                           <p className="font-bold text-gray-900">{employee.name}</p>
                           <p className="text-xs text-gray-500 font-medium">EMP-100{index + 1}</p>
@@ -122,9 +126,7 @@ const EmployeesList = () => {
                             e.stopPropagation();
                             if (window.confirm('Are you sure you want to delete this employee?')) {
                               try {
-                                await axios.delete(`/api/employees/${employee._id}`, {
-                                  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                                });
+                                await axios.delete(`/api/employees/${employee._id}`);
                                 queryClient.invalidateQueries({ queryKey: ['employees'] });
                               } catch (error) {
                                 alert('Error deleting employee');

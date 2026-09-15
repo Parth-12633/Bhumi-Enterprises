@@ -224,11 +224,12 @@ const EmployeeProfile = () => {
     <div className={`flex flex-col gap-6 max-w-5xl mx-auto font-sans text-gray-800 ${showPdfPreview ? 'hidden' : 'block'} print:hidden`}>
       
       {/* Top Header */}
-      <div className="flex justify-between items-start mb-2 border-b border-gray-100 pb-4 print:hidden">
+      <div className="flex justify-between items-center mb-2 border-b border-gray-100 pb-4 print:hidden">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 shrink-0">
              <ChevronLeft size={20} />
           </button>
+          
           <div>
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{employee?.name}</h1>
             <div className="flex items-center gap-2 mt-1">
@@ -239,6 +240,18 @@ const EmployeeProfile = () => {
             </div>
           </div>
         </div>
+
+        {/* Center Avatar */}
+        <div className="hidden sm:block">
+          {employee?.photo ? (
+            <img src={employee.photo} alt={employee?.name} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md mx-auto" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-2xl border-2 border-white shadow-md mx-auto">
+              {employee?.name?.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
         <div className="flex flex-wrap gap-2 justify-end">
           <button 
             onClick={() => navigate(`/employees/${id}/edit`)}
