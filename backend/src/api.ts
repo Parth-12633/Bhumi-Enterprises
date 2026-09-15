@@ -2,7 +2,7 @@ import serverless from 'serverless-http';
 import app from './app';
 import connectDB from './config/db';
 import User from './models/User';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 let dbConnected = false;
 
