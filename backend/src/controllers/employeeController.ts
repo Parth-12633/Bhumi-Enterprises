@@ -72,8 +72,15 @@ export const deleteEmployee = async (req: AuthRequest, res: Response) => {
     const employee = await Employee.findById(req.params.id);
     if (!employee) return res.status(404).json({ success: false, message: 'Employee not found' });
     
+    // Delete all related records
+    const WorkRecord = (await import('../models/WorkRecord')).default;
+    const Advance = (await import('../models/Advance')).default;
+    
+    await WorkRecord.deleteMany({ employee: employee._id });
+    await Advance.deleteMany({ employee: employee._id });
+    
     await Employee.deleteOne({ _id: employee._id });
-    res.json({ success: true, message: 'Employee deleted' });
+    res.json({ success: true, message: 'Employee and all associated records deleted' });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }

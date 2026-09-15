@@ -23,143 +23,145 @@ const WorkerStatementPDF: React.FC<WorkerStatementPDFProps> = ({
   const sortedRecords = records ? [...records].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) : [];
 
   return (
-    <div className="w-full bg-white font-sans text-gray-800 p-8 print:p-0 mx-auto" style={{ maxWidth: '210mm' }}>
+    <div className="w-full bg-white font-sans text-gray-800 p-4 sm:p-8 print:p-4 mx-auto" style={{ maxWidth: '100%' }}>
       
       {/* HEADER SECTION */}
-      <div className="flex justify-between items-end border-b-2 border-[#1e3a8a] pb-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b-2 border-[#1e3a8a] pb-4 mb-4 gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-[#1e3a8a] text-white flex items-center justify-center rounded-lg shadow-sm">
-            <Building2 size={28} />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#1e3a8a] text-white flex items-center justify-center rounded-lg shadow-sm shrink-0">
+            <Building2 size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-[#1e3a8a] tracking-tight uppercase leading-none mb-1">
+            <h1 className="text-xl sm:text-2xl font-black text-[#1e3a8a] tracking-tight uppercase leading-none mb-1">
               Bhumi Enterprises
             </h1>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            <p className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest">
               Building Tomorrow Together
             </p>
           </div>
         </div>
-        <div className="text-right flex flex-col gap-1 items-end">
-          <div className="bg-[#f0f9ff] text-[#0369a1] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-[#e0f2fe]">
+        <div className="text-left sm:text-right flex flex-col gap-1 sm:items-end w-full sm:w-auto">
+          <div className="bg-[#f0f9ff] text-[#0369a1] px-3 py-1.5 rounded-lg sm:rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider border border-[#e0f2fe] inline-block">
             Worker Attendance & Payment Statement
           </div>
-          <p className="text-xs text-gray-500 font-semibold mt-1">Safe Work • On Time • Together</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-semibold mt-1">Safe Work • On Time • Together</p>
         </div>
       </div>
 
       {/* EMPLOYEE DETAILS SECTION */}
-      <div className="border-2 border-[#1e3a8a] rounded-xl overflow-hidden mb-6">
-        <div className="bg-[#1e3a8a] text-white px-4 py-2 flex items-center gap-2">
+      <div className="border-2 border-[#1e3a8a] rounded-xl overflow-hidden mb-4">
+        <div className="bg-[#1e3a8a] text-white px-3 py-2 flex items-center gap-2">
           <UserIcon />
-          <h2 className="text-sm font-bold uppercase tracking-widest">Employee Details</h2>
+          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest">Employee Details</h2>
         </div>
-        <div className="p-4 bg-[#f8fafc] grid grid-cols-2 gap-x-12 gap-y-3">
-          <div className="grid grid-cols-[100px_10px_1fr] text-sm items-center">
+        <div className="p-3 bg-[#f8fafc] grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+          <div className="grid grid-cols-[80px_10px_1fr] sm:grid-cols-[100px_10px_1fr] text-[11px] sm:text-sm items-center">
             <span className="text-gray-500 font-semibold">Name</span>
             <span className="text-gray-400">:</span>
-            <span className="font-bold text-gray-900">{employee?.name}</span>
+            <span className="font-bold text-gray-900 truncate">{employee?.name}</span>
             
-            <span className="text-gray-500 font-semibold mt-2">Card No.</span>
-            <span className="text-gray-400 mt-2">:</span>
-            <span className="font-bold text-gray-900 mt-2 uppercase">{employee?._id?.substring(0, 8)}</span>
+            <span className="text-gray-500 font-semibold mt-1">Card No.</span>
+            <span className="text-gray-400 mt-1">:</span>
+            <span className="font-bold text-gray-900 mt-1 uppercase">{employee?._id?.substring(0, 8)}</span>
             
-            <span className="text-gray-500 font-semibold mt-2">Mobile</span>
-            <span className="text-gray-400 mt-2">:</span>
-            <span className="font-bold text-gray-900 mt-2">{employee?.mobile || 'N/A'}</span>
+            <span className="text-gray-500 font-semibold mt-1">Mobile</span>
+            <span className="text-gray-400 mt-1">:</span>
+            <span className="font-bold text-gray-900 mt-1">{employee?.mobile || 'N/A'}</span>
           </div>
-          <div className="grid grid-cols-[100px_10px_1fr] text-sm items-center">
+          <div className="grid grid-cols-[80px_10px_1fr] sm:grid-cols-[100px_10px_1fr] text-[11px] sm:text-sm items-start sm:items-center mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200">
             <span className="text-gray-500 font-semibold">Month</span>
             <span className="text-gray-400">:</span>
             <span className="font-bold text-gray-900">{displayMonth}</span>
             
-            <span className="text-gray-500 font-semibold mt-2">Base Rate</span>
-            <span className="text-gray-400 mt-2">:</span>
-            <span className="font-bold text-gray-900 mt-2">₹{(employee?.dailyRate / 100 || 0).toLocaleString()} / Day</span>
+            <span className="text-gray-500 font-semibold mt-1">Base Rate</span>
+            <span className="text-gray-400 mt-1">:</span>
+            <span className="font-bold text-gray-900 mt-1">₹{(employee?.dailyRate / 100 || 0).toLocaleString()} / Day</span>
             
-            <span className="text-gray-500 font-semibold mt-2">Active Sites</span>
-            <span className="text-gray-400 mt-2">:</span>
-            <span className="font-bold text-gray-900 mt-2 truncate">{Object.keys(siteWiseHajri).join(', ') || 'N/A'}</span>
+            <span className="text-gray-500 font-semibold mt-1">Active Sites</span>
+            <span className="text-gray-400 mt-1">:</span>
+            <span className="font-bold text-gray-900 mt-1 truncate block">{Object.keys(siteWiseHajri).join(', ') || 'N/A'}</span>
           </div>
         </div>
       </div>
 
       {/* DAILY ATTENDANCE TABLE */}
-      <div className="border-2 border-[#1e3a8a] rounded-xl overflow-hidden mb-6">
-        <div className="bg-[#1e3a8a] text-white px-4 py-2 flex items-center gap-2">
+      <div className="border-2 border-[#1e3a8a] rounded-xl overflow-hidden mb-4 sm:mb-6">
+        <div className="bg-[#1e3a8a] text-white px-3 py-2 flex items-center gap-2">
           <CalendarDays size={16} />
-          <h2 className="text-sm font-bold uppercase tracking-widest">Daily Attendance & Work Details</h2>
+          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest">Daily Attendance & Work Details</h2>
         </div>
-        <table className="w-full text-left border-collapse text-sm">
-          <thead className="bg-[#f1f5f9] border-b-2 border-[#1e3a8a]">
-            <tr>
-              <th className="p-3 font-bold text-[#1e3a8a] w-[15%]">Date</th>
-              <th className="p-3 font-bold text-[#1e3a8a] text-center w-[12%]">Hajri</th>
-              <th className="p-3 font-bold text-[#1e3a8a] text-right w-[15%]">Advance (₹)</th>
-              <th className="p-3 font-bold text-[#1e3a8a] w-[18%]">Site Name</th>
-              <th className="p-3 font-bold text-[#1e3a8a] w-[40%]">Work Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedRecords.length === 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-[10px] sm:text-sm min-w-[500px] sm:min-w-0">
+            <thead className="bg-[#f1f5f9] border-b-2 border-[#1e3a8a]">
               <tr>
-                <td colSpan={5} className="p-6 text-center text-gray-500 font-medium italic">No attendance records found for {displayMonth}</td>
+                <th className="p-2 sm:p-3 font-bold text-[#1e3a8a] w-[15%]">Date</th>
+                <th className="p-2 sm:p-3 font-bold text-[#1e3a8a] text-center w-[12%]">Hajri</th>
+                <th className="p-2 sm:p-3 font-bold text-[#1e3a8a] text-right w-[15%]">Advance (₹)</th>
+                <th className="p-2 sm:p-3 font-bold text-[#1e3a8a] w-[18%]">Site Name</th>
+                <th className="p-2 sm:p-3 font-bold text-[#1e3a8a] w-[40%]">Work Description</th>
               </tr>
-            ) : (
-              sortedRecords.map((record, index) => {
-                const isPayment = record.type === 'PAYMENT' || record.type === 'ADVANCE';
-                const dateStr = format(new Date(record.date), 'dd-MMM-yy');
-                
-                // Determine Hajri Badge Style
-                let badgeClass = "bg-gray-100 text-gray-600";
-                let hajriText = "-";
-                
-                if (!isPayment) {
-                  hajriText = getHajriDisplay(record.hajri);
-                  if (hajriText === 'PP' || hajriText === 'P') badgeClass = "bg-green-100 text-green-700 border border-green-200";
-                  else if (hajriText === 'A') badgeClass = "bg-red-100 text-red-700 border border-red-200";
-                  else if (record.hajri > 0) badgeClass = "bg-blue-100 text-blue-700 border border-blue-200";
-                }
+            </thead>
+            <tbody>
+              {sortedRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-4 sm:p-6 text-center text-gray-500 font-medium italic">No attendance records found for {displayMonth}</td>
+                </tr>
+              ) : (
+                sortedRecords.map((record, index) => {
+                  const isPayment = record.type === 'PAYMENT' || record.type === 'ADVANCE';
+                  const dateStr = format(new Date(record.date), 'dd-MMM-yy');
+                  
+                  // Determine Hajri Badge Style
+                  let badgeClass = "bg-gray-100 text-gray-600";
+                  let hajriText = "-";
+                  
+                  if (!isPayment) {
+                    hajriText = getHajriDisplay(record.hajri);
+                    if (hajriText === 'PP' || hajriText === 'P') badgeClass = "bg-green-100 text-green-700 border border-green-200";
+                    else if (hajriText === 'A') badgeClass = "bg-red-100 text-red-700 border border-red-200";
+                    else if (record.hajri > 0) badgeClass = "bg-blue-100 text-blue-700 border border-blue-200";
+                  }
 
-                return (
-                  <tr key={record._id || index} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
-                    <td className="p-3 font-medium text-gray-700 align-top">{dateStr}</td>
-                    <td className="p-3 text-center align-top">
-                      {isPayment ? (
-                        <span className="text-gray-400">-</span>
-                      ) : (
-                        <span className={`inline-block px-2 py-0.5 rounded font-bold text-[11px] uppercase tracking-wider ${badgeClass}`}>
-                          {hajriText}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-3 text-right font-bold text-gray-900 align-top">
-                      {isPayment && record.type === 'ADVANCE' ? (record.amount / 100).toLocaleString() : '-'}
-                    </td>
-                    <td className="p-3 text-gray-700 font-medium align-top">
-                      {!isPayment ? (record.siteId?.name || '-') : '-'}
-                    </td>
-                    <td className="p-3 text-gray-600 leading-snug align-top break-words">
-                      {isPayment ? record.note : (record.workDescription || 'No work description')}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                  return (
+                    <tr key={record._id || index} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
+                      <td className="p-2 sm:p-3 font-medium text-gray-700 align-top">{dateStr}</td>
+                      <td className="p-2 sm:p-3 text-center align-top">
+                        {isPayment ? (
+                          <span className="text-gray-400">-</span>
+                        ) : (
+                          <span className={`inline-block px-1.5 sm:px-2 py-0.5 rounded font-bold text-[9px] sm:text-[11px] uppercase tracking-wider ${badgeClass}`}>
+                            {hajriText}
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-2 sm:p-3 text-right font-bold text-gray-900 align-top">
+                        {isPayment && record.type === 'ADVANCE' ? (record.amount / 100).toLocaleString() : '-'}
+                      </td>
+                      <td className="p-2 sm:p-3 text-gray-700 font-medium align-top">
+                        {!isPayment ? (record.siteId?.name || '-') : '-'}
+                      </td>
+                      <td className="p-2 sm:p-3 text-gray-600 leading-snug align-top break-words">
+                        {isPayment ? record.note : (record.workDescription || 'No work description')}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* SUMMARY & PAYMENT DETAILS (Keep them together to prevent breaking) */}
-      <div className="grid grid-cols-2 gap-6" style={{ pageBreakInside: 'avoid' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6" style={{ pageBreakInside: 'avoid' }}>
         
         {/* LEFT: ATTENDANCE SUMMARY */}
         <div className="border-2 border-[#1e3a8a] rounded-xl overflow-hidden flex flex-col">
-          <div className="bg-[#f1f5f9] text-[#1e3a8a] px-4 py-3 flex items-center gap-2 border-b-2 border-[#1e3a8a]">
+          <div className="bg-[#f1f5f9] text-[#1e3a8a] px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 border-b-2 border-[#1e3a8a]">
             <Receipt size={18} />
-            <h2 className="text-sm font-bold uppercase tracking-widest">Attendance Summary</h2>
+            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest">Attendance Summary</h2>
           </div>
-          <div className="p-5 bg-white flex-1 flex flex-col gap-4">
+          <div className="p-4 sm:p-5 bg-white flex-1 flex flex-col gap-3 sm:gap-4">
             
             <div className="flex justify-between items-center pb-3 border-b border-gray-100">
               <div className="flex items-center gap-2 text-gray-600 font-semibold">
@@ -198,35 +200,35 @@ const WorkerStatementPDF: React.FC<WorkerStatementPDFProps> = ({
 
         {/* RIGHT: PAYMENT DETAILS */}
         <div className="border-2 border-[#166534] rounded-xl overflow-hidden flex flex-col">
-          <div className="bg-[#166534] text-white px-4 py-3 flex items-center gap-2">
+          <div className="bg-[#166534] text-white px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2">
             <IndianRupee size={18} />
-            <h2 className="text-sm font-bold uppercase tracking-widest">Payment Details</h2>
+            <h2 className="text-xs sm:text-sm font-bold uppercase tracking-widest">Payment Details</h2>
           </div>
-          <div className="p-5 bg-[#f0fdf4] flex-1 flex flex-col justify-between">
+          <div className="p-4 sm:p-5 bg-[#f0fdf4] flex-1 flex flex-col justify-between">
             
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:gap-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-bold text-gray-800">Total Earnings</p>
-                  <p className="text-xs text-gray-500 mt-0.5">({report?.totalHajri || 0} Days × ₹{(employee?.dailyRate / 100 || 0).toLocaleString()})</p>
+                  <p className="text-sm sm:text-base font-bold text-gray-800">Total Earnings</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">({report?.totalHajri || 0} Days × ₹{(employee?.dailyRate / 100 || 0).toLocaleString()})</p>
                 </div>
-                <span className="text-lg font-black text-gray-900">₹{(report?.totalEarned / 100 || 0).toLocaleString()}</span>
+                <span className="text-base sm:text-lg font-black text-gray-900">₹{(report?.totalEarned / 100 || 0).toLocaleString()}</span>
               </div>
               
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-bold text-red-600">Less: Advances Deducted</p>
+                  <p className="text-sm sm:text-base font-bold text-red-600">Less: Advances Deducted</p>
                 </div>
-                <span className="text-lg font-black text-red-600">₹{(report?.advance / 100 || 0).toLocaleString()}</span>
+                <span className="text-base sm:text-lg font-black text-red-600">₹{(report?.advance / 100 || 0).toLocaleString()}</span>
               </div>
             </div>
 
-            <div className="mt-6 bg-[#166534] text-white rounded-xl p-4 flex justify-between items-center shadow-md">
+            <div className="mt-4 sm:mt-6 bg-[#166534] text-white rounded-xl p-3 sm:p-4 flex justify-between items-center shadow-md">
               <div>
-                <p className="font-bold text-lg uppercase tracking-wider">Final Payable</p>
-                <p className="text-xs text-green-200 mt-0.5">(Total Earnings - Advance)</p>
+                <p className="font-bold text-sm sm:text-lg uppercase tracking-wider">Final Payable</p>
+                <p className="text-[9px] sm:text-xs text-green-200 mt-0.5">(Total Earnings - Advance)</p>
               </div>
-              <span className="text-3xl font-black">₹{(report?.balance / 100 || 0).toLocaleString()}</span>
+              <span className="text-xl sm:text-3xl font-black">₹{(report?.balance / 100 || 0).toLocaleString()}</span>
             </div>
 
           </div>

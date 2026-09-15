@@ -625,8 +625,8 @@ const EmployeeProfile = () => {
           </div>
         )}
         
-        <div className="w-full overflow-x-auto mt-20 sm:mt-0 pb-10 print:mt-0 print:pb-0">
-          <div id="pdf-content" className={`${showPdfPreview ? 'shadow-2xl bg-white mx-auto w-[210mm] min-w-[210mm]' : ''} print:shadow-none`}>
+        <div className="w-full mt-20 sm:mt-0 pb-10 print:mt-0 print:pb-0">
+          <div id="pdf-content" className={`${showPdfPreview ? 'shadow-none sm:shadow-2xl bg-white mx-auto w-full max-w-[210mm]' : ''} print:shadow-none`}>
             <WorkerStatementPDF 
               employee={employee}
               displayMonth={displayMonth}
