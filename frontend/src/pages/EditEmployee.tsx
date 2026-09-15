@@ -37,6 +37,59 @@ const EditEmployee = () => {
     }
   }, [employee]);
 
+  // WebRTC Camera State
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraType, setCameraType] = useState<'FRONT' | 'BACK'>('FRONT');
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+
+  const startCamera = async (type: 'FRONT' | 'BACK') => {
+    setCameraType(type);
+    setIsCameraOpen(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: type === 'FRONT' ? 'user' : 'environment' }
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      alert("Camera access denied or no camera found.");
+      setIsCameraOpen(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+    setIsCameraOpen(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      if (context) {
+        canvasRef.current.width = videoRef.current.videoWidth;
+        canvasRef.current.height = videoRef.current.videoHeight;
+        context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+        const dataUrl = canvasRef.current.toDataURL('image/jpeg');
+        setFormData({ ...formData, photo: dataUrl });
+        stopCamera();
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
   const editEmployeeMutation = useMutation({
     mutationFn: async (updatedEmployee: any) => {
       const { data } = await axios.patch(`/api/employees/${id}`, updatedEmployee);
@@ -144,27 +197,21 @@ const EditEmployee = () => {
                   </button>
                 </div>
               ) : (
-                <div className="w-full max-w-sm">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setFormData({ ...formData, photo: reader.result as string });
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                    className="block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2.5 file:px-4
-                      file:rounded-xl file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-blue-50 file:text-blue-700
-                      hover:file:bg-blue-100 cursor-pointer"
-                  />
-                  <p className="text-xs text-gray-400 mt-2">Upload a profile photo (max 1MB). Mobile users can click to open camera.</p>
+                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                  <button
+                    type="button"
+                    onClick={() => startCamera('FRONT')}
+                    className="flex-1 bg-blue-50 text-blue-600 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors"
+                  >
+                    <Camera size={18} /> Front Camera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startCamera('BACK')}
+                    className="flex-1 bg-blue-50 text-blue-600 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors"
+                  >
+                    <Camera size={18} /> Back Camera
+                  </button>
                 </div>
               )}
             </div>
@@ -224,6 +271,43 @@ const EditEmployee = () => {
           </button>
         </div>
       </form>
+
+      {/* WebRTC Camera Modal */}
+      {isCameraOpen && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-black rounded-3xl overflow-hidden flex flex-col items-center border border-gray-800">
+            <div className="absolute top-4 right-4 z-10">
+              <button 
+                onClick={stopCamera}
+                className="w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-red-500 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="w-full relative bg-gray-900 flex-1 min-h-[400px] flex items-center justify-center">
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="w-full h-full object-cover"
+                style={{ transform: cameraType === 'FRONT' ? 'scaleX(-1)' : 'none' }}
+              />
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+
+            <div className="p-6 w-full flex justify-center bg-black">
+              <button 
+                onClick={capturePhoto}
+                className="w-16 h-16 rounded-full border-4 border-white bg-white/20 flex items-center justify-center relative hover:bg-white/40 transition-colors"
+              >
+                <div className="w-12 h-12 bg-white rounded-full" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
