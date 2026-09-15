@@ -584,9 +584,9 @@ const EmployeeProfile = () => {
     </div>
 
       {/* NEW STATEMENT PDF VIEW */}
-      <div className={`${showPdfPreview ? 'block bg-gray-500 min-h-screen p-8' : 'hidden'} print:block print:p-0 print:bg-white`}>
+      <div className={`${showPdfPreview ? 'block bg-gray-500 min-h-screen p-4 sm:p-8' : 'hidden'} print:block print:p-0 print:bg-white`}>
         {showPdfPreview && (
-          <div className="fixed top-4 right-4 z-50 flex gap-4 print:hidden">
+          <div className="fixed top-4 right-4 z-50 flex flex-col sm:flex-row gap-2 sm:gap-4 print:hidden w-full sm:w-auto px-4 sm:px-0">
             <button 
               onClick={async () => {
                 try {
@@ -597,7 +597,7 @@ const EmployeeProfile = () => {
                     margin:       10,
                     filename:     `BHUMI_${employee?.name}_${displayMonth}_Statement.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true },
+                    html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
                   };
 
@@ -615,25 +615,27 @@ const EmployeeProfile = () => {
                   window.print();
                 }
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-[0_4px_15px_rgba(37,99,235,0.4)] transition-all"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-[0_4px_15px_rgba(37,99,235,0.4)] transition-all flex-1 sm:flex-none"
             >
               Download PDF File
             </button>
-            <button onClick={() => setShowPdfPreview(false)} className="bg-white hover:bg-gray-50 text-gray-800 font-bold px-6 py-2.5 rounded-xl shadow-lg border transition-all">
+            <button onClick={() => setShowPdfPreview(false)} className="bg-white hover:bg-gray-50 text-gray-800 font-bold px-6 py-3 rounded-xl shadow-lg border transition-all flex-1 sm:flex-none">
               Close Preview
             </button>
           </div>
         )}
         
-        <div id="pdf-content" className={`${showPdfPreview ? 'shadow-2xl rounded-xl overflow-hidden max-w-[210mm] mx-auto' : ''}`}>
-          <WorkerStatementPDF 
-            employee={employee}
-            displayMonth={displayMonth}
-            report={report}
-            siteWiseHajri={siteWiseHajri}
-            records={records || []}
-            getHajriDisplay={getHajriDisplay}
-          />
+        <div className="w-full overflow-x-auto mt-20 sm:mt-0 pb-10 print:mt-0 print:pb-0">
+          <div id="pdf-content" className={`${showPdfPreview ? 'shadow-2xl bg-white mx-auto w-[210mm] min-w-[210mm]' : ''} print:shadow-none`}>
+            <WorkerStatementPDF 
+              employee={employee}
+              displayMonth={displayMonth}
+              report={report}
+              siteWiseHajri={siteWiseHajri}
+              records={records || []}
+              getHajriDisplay={getHajriDisplay}
+            />
+          </div>
         </div>
       </div>
     </>
