@@ -23,7 +23,7 @@ const EditPayment = () => {
 
   const updateMutation = useMutation({
     mutationFn: async (updateData: any) => {
-      const { data } = await axios.patch(`http://localhost:5000/api/payments/${id}`, updateData);
+      const { data } = await axios.patch(`/api/payments/${id}`, updateData);
       return data;
     },
     onSuccess: () => {
@@ -38,7 +38,7 @@ const EditPayment = () => {
 
   const voidMutation = useMutation({
     mutationFn: async (voidData: { reason: string }) => {
-      const { data } = await axios.post(`http://localhost:5000/api/payments/${id}/void`, voidData);
+      const { data } = await axios.post(`/api/payments/${id}/void`, voidData);
       return data;
     },
     onSuccess: () => {

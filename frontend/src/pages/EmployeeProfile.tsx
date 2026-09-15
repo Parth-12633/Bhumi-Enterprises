@@ -7,22 +7,22 @@ import WorkerStatementPDF from '../components/WorkerStatementPDF';
 import { format, subMonths, addMonths, getDaysInMonth } from 'date-fns';
 
 const fetchEmployee = async (id: string) => {
-  const { data } = await axios.get(`http://localhost:5000/api/employees/${id}`);
+  const { data } = await axios.get(`/api/employees/${id}`);
   return data.data;
 };
 
 const fetchReport = async (id: string, month: string) => {
-  const { data } = await axios.get(`http://localhost:5000/api/reports/employee/${id}?month=${month}`);
+  const { data } = await axios.get(`/api/reports/employee/${id}?month=${month}`);
   return data.data;
 };
 
 const fetchWorkRecords = async (id: string, month: string) => {
-  const { data } = await axios.get(`http://localhost:5000/api/work-records?employeeId=${id}&month=${month}`);
+  const { data } = await axios.get(`/api/work-records?employeeId=${id}&month=${month}`);
   return data.data;
 };
 
 const fetchSites = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/sites');
+  const { data } = await axios.get('/api/sites');
   return data.data;
 };
 
@@ -78,7 +78,7 @@ const EmployeeProfile = () => {
   const { data: rates } = useQuery({
     queryKey: ['rates'],
     queryFn: async () => {
-      const { data } = await axios.get('http://localhost:5000/api/rates');
+      const { data } = await axios.get('/api/rates');
       return data.data;
     }
   });
@@ -124,7 +124,7 @@ const EmployeeProfile = () => {
 
   const saveWorkMutation = useMutation({
     mutationFn: async (workData: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/work-records', workData);
+      const { data } = await axios.post('/api/work-records', workData);
       return data;
     },
     onSuccess: () => {
@@ -140,7 +140,7 @@ const EmployeeProfile = () => {
 
   const savePayMutation = useMutation({
     mutationFn: async (payData: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/payments', payData);
+      const { data } = await axios.post('/api/payments', payData);
       return data;
     },
     onSuccess: () => {

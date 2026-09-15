@@ -76,7 +76,7 @@ const AddEmployee = () => {
 
   const addEmployeeMutation = useMutation({
     mutationFn: async (newEmployee: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/employees', newEmployee);
+      const { data } = await axios.post('/api/employees', newEmployee);
       return data;
     },
     onSuccess: () => {

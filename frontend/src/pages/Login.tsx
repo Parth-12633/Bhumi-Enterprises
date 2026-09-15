@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+      const { data } = await axios.post('/api/auth/login', { username, password });
       if (data.success) {
         login(data.data);
         navigate('/');

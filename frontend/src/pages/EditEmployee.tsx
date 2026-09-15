@@ -12,7 +12,7 @@ const EditEmployee = () => {
   const { data: employee, isLoading } = useQuery({
     queryKey: ['employee', id],
     queryFn: async () => {
-      const { data } = await axios.get(`http://localhost:5000/api/employees/${id}`);
+      const { data } = await axios.get(`/api/employees/${id}`);
       return data.data;
     }
   });
@@ -95,7 +95,7 @@ const EditEmployee = () => {
 
   const editEmployeeMutation = useMutation({
     mutationFn: async (updatedEmployee: any) => {
-      const { data } = await axios.patch(`http://localhost:5000/api/employees/${id}`, updatedEmployee);
+      const { data } = await axios.patch(`/api/employees/${id}`, updatedEmployee);
       return data;
     },
     onSuccess: () => {

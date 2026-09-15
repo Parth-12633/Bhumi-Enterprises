@@ -6,12 +6,12 @@ import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { format, subMonths, addMonths } from 'date-fns';
 
 const fetchSite = async (id: string) => {
-  const { data } = await axios.get(`http://localhost:5000/api/sites/${id}`);
+  const { data } = await axios.get(`/api/sites/${id}`);
   return data.data;
 };
 
 const fetchSiteWork = async (id: string, month: string) => {
-  const { data } = await axios.get(`http://localhost:5000/api/work-records?siteId=${id}&month=${month}`);
+  const { data } = await axios.get(`/api/work-records?siteId=${id}&month=${month}`);
   return data.data;
 };
 

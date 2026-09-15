@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, Plus, Edit, Trash2, Search, Download } from 'lucide-react';
 
 const fetchSites = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/sites');
+  const { data } = await axios.get('/api/sites');
   return data.data;
 };
 
@@ -21,7 +21,7 @@ const Sites = () => {
 
   const addSiteMutation = useMutation({
     mutationFn: async (siteData: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/sites', siteData);
+      const { data } = await axios.post('/api/sites', siteData);
       return data;
     },
     onSuccess: () => {

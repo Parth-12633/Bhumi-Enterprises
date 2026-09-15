@@ -6,7 +6,7 @@ import { Search, Plus, Trash2, Edit2, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 
 const fetchEmployees = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/employees');
+  const { data } = await axios.get('/api/employees');
   return data.data;
 };
 

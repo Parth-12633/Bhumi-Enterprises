@@ -5,7 +5,7 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 
 const fetchSites = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/sites');
+  const { data } = await axios.get('/api/sites');
   return data.data;
 };
 
@@ -28,7 +28,7 @@ const EditWorkRecord = () => {
 
   const updateMutation = useMutation({
     mutationFn: async (updateData: any) => {
-      const { data } = await axios.patch(`http://localhost:5000/api/work-records/${id}`, updateData);
+      const { data } = await axios.patch(`/api/work-records/${id}`, updateData);
       return data;
     },
     onSuccess: () => {
@@ -43,7 +43,7 @@ const EditWorkRecord = () => {
 
   const voidMutation = useMutation({
     mutationFn: async (voidData: { reason: string }) => {
-      const { data } = await axios.post(`http://localhost:5000/api/work-records/${id}/void`, voidData);
+      const { data } = await axios.post(`/api/work-records/${id}/void`, voidData);
       return data;
     },
     onSuccess: () => {

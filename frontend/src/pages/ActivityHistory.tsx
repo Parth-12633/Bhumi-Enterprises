@@ -4,7 +4,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 const fetchActivity = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/activity');
+  const { data } = await axios.get('/api/activity');
   return data.data;
 };
 

@@ -1,0 +1,23 @@
+[build]
+  base = "frontend"
+  publish = "dist"
+  # This command builds the frontend, then goes to the backend, installs dependencies, and builds the TypeScript backend!
+  command = "npm install && npm run build && cd ../backend && npm install && npm run build"
+
+[functions]
+  # Tell Netlify to look for the compiled backend functions in the backend/dist folder
+  directory = "../backend/dist"
+  node_bundler = "esbuild"
+
+# Redirect all /api requests to the serverless backend function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# React Router catch-all (Must be last!)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

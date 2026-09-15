@@ -5,12 +5,12 @@ import { format } from 'date-fns';
 import { Download } from 'lucide-react';
 
 const fetchEmployees = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/employees');
+  const { data } = await axios.get('/api/employees');
   return data.data;
 };
 
 const fetchEmployeeReport = async (id: string, month: string) => {
-  const { data } = await axios.get(`http://localhost:5000/api/reports/employee/${id}?month=${month}`);
+  const { data } = await axios.get(`/api/reports/employee/${id}?month=${month}`);
   return data.data;
 };
 

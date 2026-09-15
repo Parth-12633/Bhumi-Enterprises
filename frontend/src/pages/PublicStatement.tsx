@@ -23,7 +23,7 @@ const PublicStatement = () => {
           return;
         }
 
-        const res = await axios.get(`http://localhost:5000/api/public/statement/${id}?month=${month}`);
+        const res = await axios.get(`/api/public/statement/${id}?month=${month}`);
         setData(res.data.data);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to load statement. Please verify the link is correct.');

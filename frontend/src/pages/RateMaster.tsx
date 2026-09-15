@@ -5,12 +5,12 @@ import { Search, Plus, Download, AlertCircle, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 
 const fetchRates = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/rates');
+  const { data } = await axios.get('/api/rates');
   return data.data;
 };
 
 const fetchSites = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/sites');
+  const { data } = await axios.get('/api/sites');
   return data.data;
 };
 
@@ -28,7 +28,7 @@ const RateMaster = () => {
 
   const addRateMutation = useMutation({
     mutationFn: async (newRate: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/rates', newRate);
+      const { data } = await axios.post('/api/rates', newRate);
       return data;
     },
     onSuccess: () => {

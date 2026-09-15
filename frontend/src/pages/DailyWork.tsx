@@ -5,12 +5,12 @@ import { format } from 'date-fns';
 import { Users, UserPlus, Save } from 'lucide-react';
 
 const fetchEmployees = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/employees');
+  const { data } = await axios.get('/api/employees');
   return data.data;
 };
 
 const fetchSites = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/sites');
+  const { data } = await axios.get('/api/sites');
   return data.data;
 };
 
@@ -27,7 +27,7 @@ const DailyWork = () => {
 
   const saveWorkMutation = useMutation({
     mutationFn: async (workData: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/work-records', workData);
+      const { data } = await axios.post('/api/work-records', workData);
       return data;
     },
     onSuccess: () => {

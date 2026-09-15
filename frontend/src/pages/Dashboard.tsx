@@ -10,10 +10,10 @@ const fetchDashboardData = async (todayStr: string) => {
   try {
     const monthStr = todayStr.substring(0, 7);
     const [employeesRes, sitesRes, workRes, monthWorkRes] = await Promise.all([
-      axios.get('http://localhost:5000/api/employees'),
-      axios.get('http://localhost:5000/api/sites'),
-      axios.get(`http://localhost:5000/api/work-records?date=${todayStr}`),
-      axios.get(`http://localhost:5000/api/work-records?month=${monthStr}`)
+      axios.get('/api/employees'),
+      axios.get('/api/sites'),
+      axios.get(`/api/work-records?date=${todayStr}`),
+      axios.get(`/api/work-records?month=${monthStr}`)
     ]);
     return {
       employees: employeesRes.data.data,

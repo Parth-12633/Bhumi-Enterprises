@@ -4,7 +4,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 const fetchEmployees = async () => {
-  const { data } = await axios.get('http://localhost:5000/api/employees');
+  const { data } = await axios.get('/api/employees');
   return data.data;
 };
 
@@ -21,7 +21,7 @@ const Payments = () => {
 
   const savePaymentMutation = useMutation({
     mutationFn: async (paymentData: any) => {
-      const { data } = await axios.post('http://localhost:5000/api/payments', paymentData);
+      const { data } = await axios.post('/api/payments', paymentData);
       return data;
     },
     onSuccess: () => {
