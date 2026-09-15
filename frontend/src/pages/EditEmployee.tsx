@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Save, ArrowLeft, User, Briefcase, Trash2 } from 'lucide-react';
+import { Save, ArrowLeft, User, Briefcase, Trash2, Camera, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const EditEmployee = () => {
