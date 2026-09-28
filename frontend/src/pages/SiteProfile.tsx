@@ -160,12 +160,19 @@ const SiteProfile = () => {
       </div>
 
       <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-gray-200 shadow-sm">
-        <button onClick={handlePrevMonth} className="text-xs text-gray-500 font-semibold hover:text-blue-600 flex items-center">
-          <ChevronLeft size={14} className="mr-1" /> {prevMonthStr}
+        <button onClick={handlePrevMonth} className="text-xs text-gray-500 font-semibold hover:text-blue-600 flex items-center shrink-0">
+          <ChevronLeft size={14} className="mr-1" /> Prev
         </button>
-        <span className="font-bold text-lg text-gray-800 tracking-wide">{displayMonth}</span>
-        <button onClick={handleNextMonth} className="text-xs text-gray-500 font-semibold hover:text-blue-600 flex items-center">
-          {nextMonthStr} <ChevronRight size={14} className="ml-1" />
+        <input 
+          type="month" 
+          value={monthStr} 
+          onChange={e => {
+            if (e.target.value) setCurrentDate(new Date(e.target.value + '-01'));
+          }}
+          className="font-bold text-lg text-gray-800 tracking-wide text-center bg-transparent border-none outline-none cursor-pointer hover:text-blue-600 transition-colors"
+        />
+        <button onClick={handleNextMonth} className="text-xs text-gray-500 font-semibold hover:text-blue-600 flex items-center shrink-0">
+          Next <ChevronRight size={14} className="ml-1" />
         </button>
       </div>
 
@@ -205,7 +212,12 @@ const SiteProfile = () => {
                 {sortedDates.map((dateKey) => {
                   const dayData = groupedRecords[dateKey];
                   return (
-                    <tr key={dateKey} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <tr 
+                      key={dateKey} 
+                      onClick={() => navigate(`/daily-work?date=${dateKey}&siteId=${id}`)}
+                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                      title="Click to view and edit all workers on this day"
+                    >
                       <td className="p-4 font-bold text-sm text-gray-900">{format(new Date(dateKey), 'dd MMM yyyy')}</td>
                       <td className="p-4 text-sm font-semibold text-gray-700">{dayData.workers}</td>
                       <td className="p-4 text-sm font-semibold text-gray-700">{dayData.hajri}</td>

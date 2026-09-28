@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight, Edit2, Plus, Banknote, Calendar, CreditCard, Clock, CheckCircle2, Download, FileText, User } from 'lucide-react';
 import WorkerStatementPDF from '../components/WorkerStatementPDF';
-import { format, subMonths, addMonths, getDaysInMonth } from 'date-fns';
+import { format, subMonths, addMonths, getDaysInMonth, subDays } from 'date-fns';
 
 const fetchEmployee = async (id: string) => {
   const { data } = await axios.get(`/api/employees/${id}`);
@@ -122,19 +122,31 @@ const EmployeeProfile = () => {
   const [payAmount, setPayAmount] = useState('');
   const [payMethod, setPayMethod] = useState('CASH');
 
+  const [successToast, setSuccessToast] = useState('');
+  const [errorToast, setErrorToast] = useState('');
+
   const saveWorkMutation = useMutation({
     mutationFn: async (workData: any) => {
       const { data } = await axios.post('/api/work-records', workData);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['workRecords'] });
       queryClient.invalidateQueries({ queryKey: ['report'] });
-      alert('Work logged successfully!');
+      
+      const siteName = sites?.find((s: any) => s._id === variables.siteId)?.name || 'Unknown Site';
+      const empName = employee?.name || 'Employee';
+      const displayHajri = variables.hajri === 0 ? "A" : `${variables.hajri}P`;
+      const displayDate = format(new Date(variables.date), 'dd MMM yyyy');
+      
+      setSuccessToast(`${empName} hajri ${displayHajri} is saved with description "${variables.workDescription}" and site ${siteName} on ${displayDate}`);
+      setTimeout(() => setSuccessToast(''), 5000);
       setLogWork('');
+      setErrorToast(''); // clear any existing error
     },
     onError: (error: any) => {
-      alert('Error saving work: ' + (error.response?.data?.message || error.message));
+      setErrorToast('Error saving work: ' + (error.response?.data?.message || error.message));
+      setTimeout(() => setErrorToast(''), 7000);
     }
   });
 
@@ -146,30 +158,89 @@ const EmployeeProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workRecords'] });
       queryClient.invalidateQueries({ queryKey: ['report'] });
-      alert('Payment added successfully!');
+      setSuccessToast('Payment added successfully!');
+      setTimeout(() => setSuccessToast(''), 5000);
       setPayAmount('');
+      setErrorToast('');
     },
     onError: (error: any) => {
-      alert('Error saving payment: ' + (error.response?.data?.message || error.message));
+      setErrorToast('Error saving payment: ' + (error.response?.data?.message || error.message));
+      setTimeout(() => setErrorToast(''), 7000);
     }
   });
 
+  const handleRepeatPreviousDay = async () => {
+    let baseDate = new Date(logDate);
+    if (isNaN(baseDate.getTime())) {
+      baseDate = new Date();
+    }
+    const yesterday = format(subDays(baseDate, 1), 'yyyy-MM-dd');
+    try {
+      const { data } = await axios.get(`/api/work-records?employeeId=${id}&date=${yesterday}`);
+      const prevRecords = data.data;
+      if (!prevRecords || prevRecords.length === 0) {
+        setErrorToast("No work record found for " + yesterday);
+        setTimeout(() => setErrorToast(''), 3000);
+        return;
+      }
+      
+      const record = prevRecords.find((r: any) => r.status === 'ACTIVE' && r.type !== 'PAYMENT' && r.type !== 'ADVANCE');
+      if (record) {
+        if (record.siteId) setLogSite(record.siteId._id || record.siteId);
+        if (record.workDescription) setLogWork(record.workDescription);
+        
+        const whole = Math.floor(record.hajri);
+        const frac = record.hajri - whole;
+        setLogHajriWhole(whole);
+        setLogHajriFrac(frac);
+        
+        setSuccessToast(`Filled using previous day (${yesterday})`);
+        setTimeout(() => setSuccessToast(''), 3000);
+      } else {
+        setErrorToast("No active hajri record found for " + yesterday);
+        setTimeout(() => setErrorToast(''), 3000);
+      }
+    } catch (error) {
+      setErrorToast("Failed to load previous day record");
+      setTimeout(() => setErrorToast(''), 3000);
+    }
+  };
+
   const handleAddLog = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!logSite || logHajri === undefined || !logRate) return;
+    if (!logSite) {
+      setErrorToast('Please select a Site.');
+      setTimeout(() => setErrorToast(''), 3000);
+      return;
+    }
+    if (logHajri === undefined) {
+      setErrorToast('Please select a Hajri value.');
+      setTimeout(() => setErrorToast(''), 3000);
+      return;
+    }
+    if (logRate === '' || logRate === undefined || isNaN(Number(logRate))) {
+      setErrorToast('Please enter a valid Daily Rate.');
+      setTimeout(() => setErrorToast(''), 3000);
+      return;
+    }
+
     saveWorkMutation.mutate({
       employeeId: id,
       siteId: logSite,
       date: logDate,
       hajri: logHajri,
       workDescription: logWork,
-      rate: logRate * 100
+      rate: Number(logRate) * 100
     });
   };
 
   const handleAddPay = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!payAmount) return;
+    if (!payAmount) {
+      setErrorToast('Please enter a Payment Amount.');
+      setTimeout(() => setErrorToast(''), 3000);
+      return;
+    }
     savePayMutation.mutate({
       employeeId: id,
       amount: parseInt(payAmount) * 100,
@@ -223,6 +294,29 @@ const EmployeeProfile = () => {
     <>
     <div className={`flex flex-col gap-6 max-w-5xl mx-auto font-sans text-gray-800 ${showPdfPreview ? 'hidden' : 'block'} print:hidden`}>
       
+      {/* Fixed Toast Overlay */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 w-full max-w-md px-4 pointer-events-none">
+        {successToast && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl shadow-lg relative whitespace-pre-wrap flex items-start">
+            <CheckCircle2 className="shrink-0 mt-0.5 mr-2" size={18} />
+            <div>
+              <strong className="font-bold">Success!</strong>
+              <span className="block sm:inline ml-2">{successToast}</span>
+            </div>
+          </div>
+        )}
+        
+        {errorToast && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl shadow-lg relative whitespace-pre-wrap flex items-start">
+            <span className="font-bold text-red-700 mr-2">!</span>
+            <div>
+              <strong className="font-bold">Error:</strong>
+              <span className="block sm:inline ml-2">{errorToast}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Top Header */}
       <div className="flex justify-between items-center mb-2 border-b border-gray-100 pb-4 print:hidden">
         <div className="flex items-center gap-4">
@@ -392,6 +486,16 @@ const EmployeeProfile = () => {
       <div className="print:hidden">
         {activeTab === 'LOG' && (
           <form onSubmit={handleAddLog} className="bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col gap-6">
+            <div className="flex justify-between items-center -mb-2">
+              <h3 className="font-bold text-gray-900">Log Daily Work</h3>
+              <button 
+                type="button"
+                onClick={handleRepeatPreviousDay}
+                className="bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-xl font-bold text-xs shadow-sm transition-colors"
+              >
+                Copy Previous Day Hajri
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1.5">Date <span className="text-red-500">*</span></label>

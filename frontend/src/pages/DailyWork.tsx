@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { Users, UserPlus, Save } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const fetchEmployees = async () => {
   const { data } = await axios.get('/api/employees');
@@ -16,13 +17,19 @@ const fetchSites = async () => {
 
 const DailyWork = () => {
   const queryClient = useQueryClient();
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [siteId, setSiteId] = useState('');
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialDate = searchParams.get('date') || format(new Date(), 'yyyy-MM-dd');
+  const initialSite = searchParams.get('siteId') || '';
+
+  const [date, setDate] = useState(initialDate);
+  const [siteId, setSiteId] = useState(initialSite);
   const [workDescription, setWorkDescription] = useState('');
   
   const [selectedHajris, setSelectedHajris] = useState<Record<string, number>>({});
   const [existingRecordIds, setExistingRecordIds] = useState<Record<string, string>>({}); // employeeId -> recordId
   const [successToast, setSuccessToast] = useState('');
+  const [showAllWorkers, setShowAllWorkers] = useState(false);
 
   const { data: employees } = useQuery({ queryKey: ['employees'], queryFn: fetchEmployees });
   const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: fetchSites });
@@ -140,7 +147,11 @@ const DailyWork = () => {
   };
 
   const handleRepeatPreviousDay = async () => {
-    const yesterday = format(subDays(new Date(date), 1), 'yyyy-MM-dd');
+    let baseDate = new Date(date);
+    if (isNaN(baseDate.getTime())) {
+      baseDate = new Date();
+    }
+    const yesterday = format(subDays(baseDate, 1), 'yyyy-MM-dd');
     try {
       const { data } = await axios.get(`/api/work-records?date=${yesterday}`);
       const prevRecords = data.data;
@@ -268,13 +279,21 @@ const DailyWork = () => {
             <div className="flex items-center gap-2 text-gray-800">
               <Users size={18} /> <h2 className="font-bold text-lg">Assigned Workers</h2>
             </div>
-            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-              {activeWorkersCount} / {employees?.length || 0} Present
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full hidden sm:block">
+                {activeWorkersCount} / {employees?.length || 0} Present
+              </span>
+              <button 
+                onClick={() => setShowAllWorkers(!showAllWorkers)}
+                className="text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors shadow-sm"
+              >
+                {showAllWorkers ? 'Hide Inactive' : '+ Add Worker'}
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col gap-3">
-            {employees?.map((emp: any) => (
+            {employees?.filter((emp: any) => showAllWorkers || (selectedHajris[emp._id] !== undefined && selectedHajris[emp._id] > 0)).map((emp: any) => (
               <div key={emp._id} className="bg-white px-4 py-3 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-gray-300">
                 
                 <div className="flex items-center gap-4">
