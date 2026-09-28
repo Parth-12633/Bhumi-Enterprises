@@ -74,10 +74,10 @@ export const deleteEmployee = async (req: AuthRequest, res: Response) => {
     
     // Delete all related records
     const WorkRecord = (await import('../models/WorkRecord')).default;
-    const Advance = (await import('../models/Advance')).default;
+    const Payment = (await import('../models/Payment')).default;
     
-    await WorkRecord.deleteMany({ employee: employee._id });
-    await Advance.deleteMany({ employee: employee._id });
+    await WorkRecord.deleteMany({ employeeId: employee._id });
+    await Payment.deleteMany({ employeeId: employee._id });
     
     await Employee.deleteOne({ _id: employee._id });
     res.json({ success: true, message: 'Employee and all associated records deleted' });

@@ -16,7 +16,8 @@ const Layout = () => {
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { name: 'Employees', icon: Users, path: '/employees' },
     { name: 'Sites', icon: MapPin, path: '/sites' },
-    { name: 'Reports', icon: FileText, path: '/reports' },
+    { name: 'Employee Analytics', icon: FileText, path: '/reports' },
+    { name: 'Site Analytics', icon: Calculator, path: '/site-reports' },
   ];
 
   return (

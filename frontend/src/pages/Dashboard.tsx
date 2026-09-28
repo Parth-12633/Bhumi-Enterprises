@@ -178,7 +178,7 @@ const Dashboard = () => {
                    <tr><td colSpan={5} className="text-center py-4 text-sm text-gray-500">No work records for today.</td></tr>
                 ) : (
                   data?.todayWork?.map((w: any) => {
-                    const empName = data?.employees?.find((e: any) => e._id === w.employeeId)?.name || 'Unknown';
+                    const empName = w.employeeId?.name || 'Unknown';
                     return (
                       <tr key={w._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3 font-bold text-sm text-gray-900">{empName}</td>

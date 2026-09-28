@@ -16,22 +16,78 @@ const fetchSites = async () => {
 
 const DailyWork = () => {
   const queryClient = useQueryClient();
-  const [date] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [siteId, setSiteId] = useState('');
   const [workDescription, setWorkDescription] = useState('');
   
   const [selectedHajris, setSelectedHajris] = useState<Record<string, number>>({});
+  const [existingRecordIds, setExistingRecordIds] = useState<Record<string, string>>({}); // employeeId -> recordId
+  const [successToast, setSuccessToast] = useState('');
 
   const { data: employees } = useQuery({ queryKey: ['employees'], queryFn: fetchEmployees });
   const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: fetchSites });
 
+  // Fetch records for the currently selected date
+  const { data: existingRecords, isLoading: isLoadingExisting } = useQuery({
+    queryKey: ['workRecords', date],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/work-records?date=${date}`);
+      return data.data;
+    }
+  });
+
+  // When existingRecords loads, populate the form
+  React.useEffect(() => {
+    if (existingRecords && existingRecords.length > 0) {
+      const hajris: Record<string, number> = {};
+      const recordIds: Record<string, string> = {};
+      
+      // We will take the siteId and description from the first active record
+      let firstSiteId = '';
+      let firstDesc = '';
+
+      existingRecords.forEach((record: any) => {
+        if (record.status === 'ACTIVE') {
+          const empId = record.employeeId?._id || record.employeeId;
+          hajris[empId] = record.hajri;
+          recordIds[empId] = record._id;
+          
+          if (!firstSiteId && record.siteId) {
+            firstSiteId = record.siteId._id || record.siteId;
+          }
+          if (!firstDesc && record.workDescription) {
+            firstDesc = record.workDescription;
+          }
+        }
+      });
+      
+      setSelectedHajris(hajris);
+      setExistingRecordIds(recordIds);
+      if (firstSiteId) setSiteId(firstSiteId);
+      if (firstDesc) setWorkDescription(firstDesc);
+    } else {
+      setSelectedHajris({});
+      setExistingRecordIds({});
+      setSiteId('');
+      setWorkDescription('');
+    }
+  }, [existingRecords]);
+
   const saveWorkMutation = useMutation({
     mutationFn: async (workData: any) => {
-      const { data } = await axios.post('/api/work-records', workData);
-      return data;
+      if (workData.id) {
+        // Update existing record
+        const { data } = await axios.patch(`/api/work-records/${workData.id}`, workData);
+        return data;
+      } else {
+        // Create new record
+        const { data } = await axios.post('/api/work-records', workData);
+        return data;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workRecords'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     }
   });
 
@@ -48,10 +104,22 @@ const DailyWork = () => {
       alert("Please enter a Work Description before saving.");
       return;
     }
+
+    const savedDetails: string[] = [];
+    const site = sites?.find((s: any) => s._id === siteId);
+
     const promises = Object.entries(selectedHajris).map(([empId, hajri]) => {
       const emp = employees?.find((e: any) => e._id === empId);
       const rate = emp ? emp.dailyRate : 0;
+      
+      if (emp && site) {
+        const displayHajri = hajri === 0 ? "A" : `${hajri}P`;
+        const displayDate = format(new Date(date), 'dd MMM yyyy');
+        savedDetails.push(`${emp.name} hajri ${displayHajri} is saved with description "${workDescription}" and site ${site.name} on ${displayDate}`);
+      }
+
       return saveWorkMutation.mutateAsync({
+        id: existingRecordIds[empId], // if it exists, it patches
         employeeId: empId,
         siteId,
         date,
@@ -63,10 +131,47 @@ const DailyWork = () => {
 
     try {
       await Promise.all(promises);
-      alert('Work saved successfully!');
-      setSelectedHajris({});
+      setSuccessToast(savedDetails.join('\n'));
+      setTimeout(() => setSuccessToast(''), 5000); // hide after 5s
+      // We do not clear selectedHajris because we are "viewing/editing" this date
     } catch (err) {
       alert('Error saving some records.');
+    }
+  };
+
+  const handleRepeatPreviousDay = async () => {
+    const yesterday = format(subDays(new Date(date), 1), 'yyyy-MM-dd');
+    try {
+      const { data } = await axios.get(`/api/work-records?date=${yesterday}`);
+      const prevRecords = data.data;
+      if (!prevRecords || prevRecords.length === 0) {
+        alert("No records found for " + yesterday);
+        return;
+      }
+      
+      const hajris: Record<string, number> = {};
+      let firstSiteId = '';
+      let firstDesc = '';
+
+      prevRecords.forEach((record: any) => {
+        if (record.status === 'ACTIVE') {
+          const empId = record.employeeId?._id || record.employeeId;
+          hajris[empId] = record.hajri;
+          
+          if (!firstSiteId && record.siteId) {
+            firstSiteId = record.siteId._id || record.siteId;
+          }
+          if (!firstDesc && record.workDescription) {
+            firstDesc = record.workDescription;
+          }
+        }
+      });
+      
+      setSelectedHajris(hajris);
+      if (firstSiteId) setSiteId(firstSiteId);
+      if (firstDesc) setWorkDescription(firstDesc);
+    } catch (error) {
+      alert("Failed to load previous day records");
     }
   };
 
@@ -96,9 +201,32 @@ const DailyWork = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl h-full relative pb-[100px]">
-      <div className="flex flex-col">
-        <h1 className="text-xl font-bold text-gray-900">Daily Work</h1>
-        <p className="text-xs text-gray-500 font-medium mt-1">{format(new Date(), 'dd MMMM yyyy')}</p>
+      {successToast && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative whitespace-pre-wrap">
+          <strong className="font-bold">Success!</strong>
+          <span className="block sm:inline ml-2">{successToast}</span>
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col">
+          <h1 className="text-xl font-bold text-gray-900">Daily Work</h1>
+          <div className="flex items-center gap-2 mt-2">
+            <input 
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+          </div>
+        </div>
+        
+        <button 
+          onClick={handleRepeatPreviousDay}
+          className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-xl font-bold text-sm shadow-sm transition-colors self-start sm:self-auto"
+        >
+          Repeat Previous Day Hajri
+        </button>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">

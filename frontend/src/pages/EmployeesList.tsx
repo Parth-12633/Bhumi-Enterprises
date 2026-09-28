@@ -37,7 +37,12 @@ const EmployeesList = () => {
       {/* Header */}
       <div className="flex justify-between items-start mb-2 border-b border-gray-100 pb-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Employees</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Employees</h1>
+            <span className="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm">
+              Total: {employees?.length || 0}
+            </span>
+          </div>
           <p className="text-gray-500 text-sm mt-1">Manage employee information, personal details, contact, role, and joining status.</p>
         </div>
         <Link to="/add-employee" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 text-sm hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">

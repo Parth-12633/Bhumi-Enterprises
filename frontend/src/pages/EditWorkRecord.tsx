@@ -106,7 +106,7 @@ const EditWorkRecord = () => {
           <select 
             value={siteId} 
             onChange={(e) => setSiteId(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-contractorBlue outline-none"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
           >
             <option value="">Select a Site ▼</option>
             {sites?.map((site: any) => (
@@ -121,7 +121,7 @@ const EditWorkRecord = () => {
             type="text" 
             value={workDescription}
             onChange={(e) => setWorkDescription(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-contractorBlue outline-none"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
           />
         </div>
 
@@ -132,7 +132,7 @@ const EditWorkRecord = () => {
             placeholder="e.g. Forgot half hajri"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-contractorBlue outline-none"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
           />
         </div>
 
@@ -147,7 +147,7 @@ const EditWorkRecord = () => {
           <button 
             type="submit"
             disabled={updateMutation.isPending}
-            className="flex-1 bg-contractorBlue text-white py-3 rounded-lg font-bold disabled:opacity-50"
+            className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold disabled:opacity-50"
           >
             {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
           </button>

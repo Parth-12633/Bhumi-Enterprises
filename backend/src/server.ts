@@ -27,6 +27,28 @@ const startServer = async () => {
     console.log('Users seeded successfully!');
   }
 
+  // CLEANUP ORPHANED RECORDS (Fixes Dashboard totals for already deleted employees)
+  try {
+    console.log('Cleaning up orphaned records...');
+    const Employee = (await import('./models/Employee')).default;
+    const WorkRecord = (await import('./models/WorkRecord')).default;
+    const Payment = (await import('./models/Payment')).default;
+    
+    // Get all valid employee IDs
+    const validEmployees = await Employee.find({}, '_id');
+    const validEmployeeIds = validEmployees.map(e => e._id);
+    
+    // Delete records where employeeId is NOT in the list of valid employees
+    const deletedWork = await WorkRecord.deleteMany({ employeeId: { $nin: validEmployeeIds } });
+    const deletedPayments = await Payment.deleteMany({ employeeId: { $nin: validEmployeeIds } });
+    
+    if (deletedWork.deletedCount > 0 || deletedPayments.deletedCount > 0) {
+      console.log(`Cleaned up ${deletedWork.deletedCount} orphaned work records and ${deletedPayments.deletedCount} orphaned payments.`);
+    }
+  } catch (error) {
+    console.error('Cleanup failed:', error);
+  }
+
   const PORT = process.env.PORT || 5000;
 
   app.listen(PORT, () => {

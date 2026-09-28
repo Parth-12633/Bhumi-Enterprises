@@ -584,9 +584,16 @@ const EmployeeProfile = () => {
     </div>
 
       {/* NEW STATEMENT PDF VIEW */}
-      <div className={`${showPdfPreview ? 'block bg-gray-500 min-h-screen p-4 sm:p-8' : 'hidden'} print:block print:p-0 print:bg-white`}>
+      <div className={`${showPdfPreview ? 'fixed inset-0 z-[100] bg-gray-500 overflow-y-auto p-4 sm:p-8 pt-24 sm:pt-24' : 'hidden'} print:block print:relative print:z-auto print:p-0 print:bg-white print:overflow-visible`}>
         {showPdfPreview && (
-          <div className="fixed top-4 right-4 z-50 flex flex-col sm:flex-row gap-2 sm:gap-4 print:hidden w-full sm:w-auto px-4 sm:px-0">
+          <div className="fixed top-4 left-0 right-0 z-[110] flex justify-between items-center print:hidden px-4 sm:px-8 pointer-events-none">
+            <button 
+              onClick={() => setShowPdfPreview(false)} 
+              className="bg-white hover:bg-gray-50 text-gray-800 font-bold px-4 sm:px-6 py-3 rounded-xl shadow-lg border border-gray-200 transition-all flex items-center gap-2 pointer-events-auto"
+            >
+              <ChevronLeft size={20} /> <span className="hidden sm:inline">Back to Profile</span>
+            </button>
+            
             <button 
               onClick={async () => {
                 try {
@@ -615,17 +622,14 @@ const EmployeeProfile = () => {
                   window.print();
                 }
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-[0_4px_15px_rgba(37,99,235,0.4)] transition-all flex-1 sm:flex-none"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 sm:px-6 py-3 rounded-xl shadow-[0_4px_15px_rgba(37,99,235,0.4)] transition-all flex items-center gap-2 pointer-events-auto"
             >
-              Download PDF File
-            </button>
-            <button onClick={() => setShowPdfPreview(false)} className="bg-white hover:bg-gray-50 text-gray-800 font-bold px-6 py-3 rounded-xl shadow-lg border transition-all flex-1 sm:flex-none">
-              Close Preview
+              <Download size={20} /> <span className="hidden sm:inline">Download PDF File</span>
             </button>
           </div>
         )}
         
-        <div className="w-full mt-20 sm:mt-0 pb-10 print:mt-0 print:pb-0">
+        <div className="w-full pb-10 print:mt-0 print:pb-0">
           <div id="pdf-content" className={`${showPdfPreview ? 'shadow-none sm:shadow-2xl bg-white mx-auto w-full max-w-[210mm]' : ''} print:shadow-none`}>
             <WorkerStatementPDF 
               employee={employee}

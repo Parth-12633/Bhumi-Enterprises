@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Edit, CheckCircle2, RotateCcw, X, Check } from 'lucide-react';
 import { format, subMonths, addMonths } from 'date-fns';
 
 const fetchSite = async (id: string) => {
@@ -25,9 +25,18 @@ const SiteProfile = () => {
   const prevMonthStr = format(subMonths(currentDate, 1), 'MMMM yyyy');
   const nextMonthStr = format(addMonths(currentDate, 1), 'MMMM yyyy');
 
+  const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({ name: '', location: '' });
+
   const { data: site, isLoading: siteLoading } = useQuery({
     queryKey: ['site', id],
-    queryFn: () => fetchSite(id as string)
+    queryFn: () => {
+      return fetchSite(id as string).then(data => {
+        setEditData({ name: data.name, location: data.location });
+        return data;
+      });
+    }
   });
 
   const { data: records, isLoading: recordsLoading } = useQuery({
@@ -35,10 +44,35 @@ const SiteProfile = () => {
     queryFn: () => fetchSiteWork(id as string, monthStr)
   });
 
+  const updateSiteMutation = useMutation({
+    mutationFn: async (updateData: any) => {
+      const { data } = await axios.patch(`/api/sites/${id}`, updateData);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site', id] });
+      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      setIsEditing(false);
+    },
+    onError: (error: any) => {
+      alert('Error updating site: ' + (error.response?.data?.message || error.message));
+    }
+  });
+
+  const handleUpdateStatus = (newStatus: string) => {
+    if (window.confirm(`Are you sure you want to change site status to ${newStatus}?`)) {
+      updateSiteMutation.mutate({ status: newStatus });
+    }
+  };
+
+  const handleSaveEdit = () => {
+    updateSiteMutation.mutate(editData);
+  };
+
   const handlePrevMonth = () => setCurrentDate(prev => subMonths(prev, 1));
   const handleNextMonth = () => setCurrentDate(prev => addMonths(prev, 1));
 
-  if (siteLoading) return <div className="p-8">Loading site...</div>;
+  if (siteLoading) return <div className="p-8 font-semibold text-gray-500">Loading site...</div>;
 
   // Group records by date
   const groupedRecords: Record<string, any> = {};
@@ -69,22 +103,59 @@ const SiteProfile = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl">
-      <div className="flex justify-between items-center -mt-4 mb-2">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-gray-800">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center -mt-4 mb-2 gap-4">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-gray-800 shrink-0">
              <ChevronLeft size={24} />
           </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{site?.name}</h1>
-            <div className="flex items-center gap-2 mt-0.5">
-              {site?.status === 'ACTIVE' ? (
-                <span className="text-[10px] font-bold text-successGreen bg-green-50 px-2 py-0.5 rounded border border-green-200">Active</span>
-              ) : (
-                <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">Inactive</span>
-              )}
-              <span className="text-xs text-gray-500 font-medium flex items-center gap-1"><MapPin size={12} /> {site?.location || 'No location'}</span>
+          
+          {isEditing ? (
+            <div className="flex flex-col gap-2 w-full">
+              <input type="text" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full sm:w-64 p-2 text-lg font-bold border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Site Name" />
+              <input type="text" value={editData.location} onChange={e => setEditData({...editData, location: e.target.value})} className="w-full sm:w-64 p-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Location" />
             </div>
-          </div>
+          ) : (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">{site?.name}</h1>
+              <div className="flex items-center gap-2 mt-0.5">
+                {site?.status === 'ACTIVE' ? (
+                  <span className="text-[10px] font-bold text-successGreen bg-green-50 px-2 py-0.5 rounded border border-green-200">Active</span>
+                ) : (
+                  <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">Completed</span>
+                )}
+                <span className="text-xs text-gray-500 font-medium flex items-center gap-1"><MapPin size={12} /> {site?.location || 'No location'}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto ml-9 sm:ml-0">
+          {isEditing ? (
+            <>
+              <button onClick={() => setIsEditing(false)} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors">
+                <X size={16} /> Cancel
+              </button>
+              <button onClick={handleSaveEdit} disabled={updateSiteMutation.isPending} className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center gap-1 transition-colors">
+                <Check size={16} /> {updateSiteMutation.isPending ? 'Saving...' : 'Save'}
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setIsEditing(true)} className="px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-bold flex items-center gap-1 shadow-sm transition-colors">
+                <Edit size={16} /> Edit
+              </button>
+              
+              {site?.status === 'ACTIVE' ? (
+                <button onClick={() => handleUpdateStatus('COMPLETED')} className="px-3 py-1.5 bg-white border border-red-200 hover:bg-red-50 text-red-600 rounded-lg text-sm font-bold flex items-center gap-1 shadow-sm transition-colors">
+                  <CheckCircle2 size={16} /> End Site
+                </button>
+              ) : (
+                <button onClick={() => handleUpdateStatus('ACTIVE')} className="px-3 py-1.5 bg-white border border-blue-200 hover:bg-blue-50 text-blue-600 rounded-lg text-sm font-bold flex items-center gap-1 shadow-sm transition-colors">
+                  <RotateCcw size={16} /> Revert Site
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 

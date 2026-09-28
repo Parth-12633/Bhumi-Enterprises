@@ -81,10 +81,6 @@ const Sites = () => {
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Start Date</label>
               <input type="date" value={newSite.startDate} onChange={e => setNewSite({...newSite, startDate: e.target.value})} className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none" />
             </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">End Date (Auto-completes site)</label>
-              <input type="date" value={newSite.endDate} onChange={e => setNewSite({...newSite, endDate: e.target.value})} className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none" />
-            </div>
           </div>
           <button type="submit" disabled={addSiteMutation.isPending} className="bg-blue-600 text-white font-bold py-2.5 px-8 rounded-xl self-start mt-2 shadow-sm hover:bg-blue-700 disabled:opacity-70">
             {addSiteMutation.isPending ? 'Saving...' : 'Save Site'}

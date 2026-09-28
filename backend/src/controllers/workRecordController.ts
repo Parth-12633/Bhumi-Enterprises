@@ -13,11 +13,18 @@ export const getWorkRecords = async (req: AuthRequest, res: Response) => {
     if (siteId) query.siteId = siteId;
     if (date) query.date = date;
     if (month) {
-      // month format YYYY-MM
       query.date = { $regex: `^${month}` };
+    }
+    if (req.query.startDate && req.query.endDate) {
+      query.date = { $gte: req.query.startDate, $lte: req.query.endDate };
+    } else if (req.query.startDate) {
+      query.date = { $gte: req.query.startDate };
+    } else if (req.query.endDate) {
+      query.date = { $lte: req.query.endDate };
     }
 
     const records = await WorkRecord.find(query)
+      .populate('employeeId', 'name')
       .populate('siteId', 'name')
       .populate('createdBy', 'name username')
       .populate('updatedBy', 'name username')

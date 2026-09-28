@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Download, Printer, AlertCircle, Loader2 } from 'lucide-react';
 import WorkerStatementPDF from '../components/WorkerStatementPDF';
 import { format } from 'date-fns';
+import { getHajriDisplay } from './EmployeeProfile';
 
 const PublicStatement = () => {
   const { id } = useParams();
@@ -35,14 +36,7 @@ const PublicStatement = () => {
     fetchStatement();
   }, [id, month]);
 
-  const getHajriDisplay = (val: number) => {
-    if (val === 0) return 'A';
-    if (val === 1) return 'PP';
-    if (val === 0.25) return 'P|';
-    if (val === 0.5) return 'P||';
-    if (val === 0.75) return 'P|||';
-    return val.toString();
-  };
+
 
   const handleDownload = async () => {
     try {

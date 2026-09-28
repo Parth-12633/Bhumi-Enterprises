@@ -28,9 +28,7 @@ export const createSite = async (req: AuthRequest, res: Response) => {
   try {
     let { name, location, clientName, notes, startDate, endDate, status } = req.body;
     
-    if (endDate && new Date(endDate) <= new Date()) {
-      status = 'COMPLETED';
-    }
+
 
     const site = new Site({
       name,
@@ -63,10 +61,6 @@ export const updateSite = async (req: AuthRequest, res: Response) => {
       if (req.body.endDate !== undefined) site.endDate = req.body.endDate;
       
       site.status = req.body.status || site.status;
-
-      if (site.endDate && new Date(site.endDate) <= new Date()) {
-        site.status = 'COMPLETED';
-      }
 
       const updatedSite = await site.save();
       res.json({ success: true, data: updatedSite });

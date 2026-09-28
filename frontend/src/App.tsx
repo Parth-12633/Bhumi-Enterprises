@@ -18,6 +18,7 @@ import Payments from './pages/Payments';
 import PaymentEntry from './pages/PaymentEntry';
 import PublicStatement from './pages/PublicStatement';
 import Reports from './pages/Reports';
+import SiteReports from './pages/SiteReports';
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ function AppRoutes() {
         <Route path="reports" element={<Reports />} />
         <Route path="edit-work/:id" element={<EditWorkRecord />} />
         <Route path="edit-payment/:id" element={<EditPayment />} />
+        <Route path="site-reports" element={<SiteReports />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
